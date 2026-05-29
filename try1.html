@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吉娃子人物史料资料库</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 自定义色彩变量 */
+        :root {
+            --cream: #f5f1ed;
+            --ink: #2c2c2c;
+            --dark-red: #8b4142;
+            --revolution-red: #d32f2f;
+            --light-gray: #e8e4e0;
+            --accent: #c41e3a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'SimSun', serif;
+            background-color: var(--cream);
+            color: var(--ink);
+            line-height: 1.8;
+        }
+
+        /* 淡入动效 */
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 卡片悬浮效果 */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(44, 44, 44, 0.1);
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            background-color: var(--cream);
+            border-bottom: 2px solid var(--accent);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-link {
+            position: relative;
+            color: var(--ink);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        /* 时间线样式 */
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-item::before {
+            content: '★';
+            position: absolute;
+            left: -0.3rem;
+            top: 0rem;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 0.35rem;
+            top: 1.8rem;
+            width: 2px;
+            height: calc(100% + 1rem);
+            background-color: var(--light-gray);
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        /* 图片网格 */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .image-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 图片卡片 */
+        .image-card {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 4/5;
+            background-color: var(--light-gray);
+            border: 1px solid var(--light-gray);
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+        }
+
+        /* PDF卡片 */
+        .pdf-card {
+            background-color: white;
+            border-left: 4px solid var(--accent);
+        }
+
+        /* 书籍卡片 */
+        .book-card {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: white;
+            border: 1px solid var(--light-gray);
+        }
+
+        .book-cover {
+            width: 80px;
+            height: 120px;
+            background-color: var(--light-gray);
+            flex-shrink: 0;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--accent);
+            color: var(--cream);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+        }
+
+        .btn:hover {
+            background-color: var(--ink);
+            transform: translateY(-2px);
+        }
+
+        /* 章节标题 */
+        .section-title {
+            font-size: 1.75rem;
+            color: var(--ink);
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '★';
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+
+        /* 移动端菜单 */
+        .mobile-menu {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu {
+                display: block;
+            }
+
+            .desktop-nav {
+                display: none;
+            }
+        }
+
+        /* 横幅样式 */
+        .banner {
+            background: linear-gradient(135deg, var(--light-gray) 0%, var(--cream) 100%);
+            padding: 3rem 1rem;
+            text-align: center;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .banner-title {
+            font-size: clamp(2rem, 5vw, 4rem);
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+
+        .banner-subtitle {
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+
+        /* 运动时期标签 */
+        .period-badge {
+            display: inline-block;
+            background-color: var(--accent);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* 历史背景卡片 */
+        .history-card {
+            background-color: white;
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .history-card h4 {
+            color: var(--accent);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        /* 理论著作标签 */
+        .theory-badge {
+            background-color: #fce4ec;
+            color: var(--accent);
+            padding: 0.25rem 0.75rem;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        /* 活动参与标签 */
+        .activity-badge {
+            background-color: #fff3e0;
+            color: #e65100;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        /* 红色强调 */
+        .accent-red {
+            color: var(--accent);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="text-lg font-bold flex items-center gap-2" style="color: var(--accent);">
+                ★ 吉娃子资料库
+            </div>
+
+            <!-- 桌面端导航 -->
+            <div class="desktop-nav flex gap-6">
+                <a href="#" class="nav-link active" onclick="switchPage('home')">首页</a>
+                <a href="#" class="nav-link" onclick="switchPage('timeline')">年谱</a>
+                <a href="#" class="nav-link" onclick="switchPage('movement')">运动</a>
+                <a href="#" class="nav-link" onclick="switchPage('photos')">照片</a>
+                <a href="#" class="nav-link" onclick="switchPage('documents')">文献</a>
+                <a href="#" class="nav-link" onclick="switchPage('books')">书籍</a>
+                <a href="#" class="nav-link" onclick="switchPage('anecdotes')">趣事</a>
+                <a href="#" class="nav-link" onclick="switchPage('about')">关于</a>
+            </div>
+
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu text-2xl" onclick="toggleMobileMenu()">≡</button>
+        </div>
+
+        <!-- 移动端菜单 -->
+        <div id="mobileMenu" class="hidden bg-white border-t-2" style="border-color: var(--accent);">
+            <a href="#" class="block px-4 py-3 hover:bg-gray-100" onclick="switchPage('home'); toggleMobileMenu();">首页</a>
+            <a href="#" class="block px-4 py-3 hover:bg-gray-100" onclick="switchPage('timeline'); toggleMobileMenu();">年谱</a>
+            <a href="#" class="block px-4 py-3 hover:bg-gray-100" onclick="switchPage('movement'); toggleMobileMenu();">运动</a>
+            <a href="#" class="block px-4 py-3 hover:bg-gray-100" onclick="switchPage('photos'); toggleMobileMenu();">照片</a>
+            <a href="#" class="block px-4 py-3 hover:bg-gray-100" onclick="switchPage('documents'); toggleMobileMenu();">文献</a>
+            <a href="#" class="block px-4 py-3 hover:bg-gray-100" onclick="switchPage('books'); toggleMobileMenu();">书籍</a>
+            <a href="#" class="block px-4 py-3 hover:bg-gray-100" onclick="switchPage('anecdotes'); toggleMobileMenu();">趣事</a>
+            <a href="#" class="block px-4 py-3 hover:bg-gray-100" onclick="switchPage('about'); toggleMobileMenu();">关于</a>
+        </div>
+    </nav>
+
+    <!-- 页面容器 -->
+    <div id="pageContainer" class="pt-20">
+        <!-- ========== 首页 ========== -->
+        <div id="home" class="page fade-in">
+            <!-- 人物横幅 -->
+            <div class="banner">
+                <h1 class="banner-title">吉娃子</h1>
+                <p class="banner-subtitle">共产主义运动先驱与理论家</p>
+                <p style="color: var(--ink); margin-top: 0.5rem;">生卒年份待补充</p>
+            </div>
+
+            <!-- 主容器 -->
+            <div class="max-w-7xl mx-auto px-4 py-12">
+                <!-- 运动背景介绍 -->
+                <section class="mb-16">
+                    <h2 class="section-title">历史背景</h2>
+                    <div class="history-card">
+                        <h4>★ 主要活动时期</h4>
+                        <p class="mb-3">吉娃子的活动生涯贯穿了中共建党初期、早期斗争、革命根据地建设等重要历史时期。其理论贡献与实践经历深刻反映了这一时代的历史发展轨迹。</p>
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            <span class="period-badge">中共一大（1921）</span>
+                            <span class="period-badge">大革命时期</span>
+                            <span class="period-badge">土地革命战争</span>
+                            <span class="period-badge">抗日战争</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 年度生平时间线 -->
+                <section class="mb-16">
+                    <h2 class="section-title">生平概览</h2>
+                    <div class="grid md:grid-cols-2 gap-12">
+                        <div>
+                            <div class="timeline-item">
+                                <div class="font-bold" style="color: var(--accent);">早期活动</div>
+                                <p class="text-sm text-gray-600">待补充年份</p>
+                                <p>思想启蒙与党的早期组织工作...</p>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="font-bold" style="color: var(--accent);">理论探索</div>
+                                <p class="text-sm text-gray-600">待补充年份</p>
+                                <p>共产主义理论著作与思想阐述...</p>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="font-bold" style="color: var(--accent);">运动参与</div>
+                                <p class="text-sm text-gray-600">待补充年份</p>
+                                <p>领导社会运动与革命斗争...</p>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="timeline-item">
+                                <div class="font-bold" style="color: var(--accent);">国际联系</div>
+                                <p class="text-sm text-gray-600">待补充年份</p>
+                                <p>与共产国际及国际工人运动的联系...</p>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="font-bold" style="color: var(--accent);">根据地建设</div>
+                                <p class="text-sm text-gray-600">待补充年份</p>
+                                <p>参与革命根据地的建设与发展...</p>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="font-bold" style="color: var(--accent);">后期贡献</div>
+                                <p class="text-sm text-gray-600">待补充年份</p>
+                                <p>晚年理论总结与历史评价...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 四大板块入口卡片 -->
+                <section class="mb-16">
+                    <h2 class="section-title">资料中心</h2>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- 运动参与 -->
+                        <div class="card-hover p-6 bg-white border border-gray-200" style="cursor: pointer;" onclick="switchPage('movement')">
+                            <div style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;">🚩</div>
+                            <h3 class="font-bold mb-2">运动参与</h3>
+                            <p class="text-sm text-gray-600">社会运动与革命活动记录</p>
+                            <div style="color: var(--accent); margin-top: 1rem; font-size: 0.9rem;">→ 浏览</div>
+                        </div>
+
+                        <!-- 照片板块 -->
+                        <div class="card-hover p-6 bg-white border border-gray-200" style="cursor: pointer;" onclick="switchPage('photos')">
+                            <div style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;">📷</div>
+                            <h3 class="font-bold mb-2">历史照片</h3>
+                            <p class="text-sm text-gray-600">珍贵历史照片与时代风貌</p>
+                            <div style="color: var(--accent); margin-top: 1rem; font-size: 0.9rem;">→ 浏览</div>
+                        </div>
+
+                        <!-- 文献板块 -->
+                        <div class="card-hover p-6 bg-white border border-gray-200" style="cursor: pointer;" onclick="switchPage('documents')">
+                            <div style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;">📄</div>
+                            <h3 class="font-bold mb-2">文献库</h3>
+                            <p class="text-sm text-gray-600">著作、论文、档案文献</p>
+                            <div style="color: var(--accent); margin-top: 1rem; font-size: 0.9rem;">→ 浏览</div>
+                        </div>
+
+                        <!-- 书籍板块 -->
+                        <div class="card-hover p-6 bg-white border border-gray-200" style="cursor: pointer;" onclick="switchPage('books')">
+                            <div style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;">📚</div>
+                            <h3 class="font-bold mb-2">书籍整理</h3>
+                            <p class="text-sm text-gray-600">著作、研究、史料书籍</p>
+                            <div style="color: var(--accent); margin-top: 1rem; font-size: 0.9rem;">→ 浏览</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 资料更新动态 -->
+                <section>
+                    <h2 class="section-title">最新更新</h2>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-white border-l-4" style="border-color: var(--accent);">
+                            <p class="font-bold">2024年5月</p>
+                            <p class="text-sm text-gray-600 mt-1">★ 网站建立，资料库启动</p>
+                        </div>
+                        <div class="p-4 bg-white border-l-4" style="border-color: var(--accent);">
+                            <p class="font-bold">待更新</p>
+                            <p class="text-sm text-gray-600 mt-1">★ 持续收集运动资料与理论著作...</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- ========== 年谱页 ========== -->
+        <div id="timeline" class="page fade-in hidden">
+            <div class="max-w-4xl mx-auto px-4 py-12">
+                <h1 class="section-title mb-8" style="margin-top: 2rem;">吉娃子年谱</h1>
+
+                <div class="space-y-8">
+                    <div class="timeline-item">
+                        <h3 class="font-bold text-lg mb-2" style="color: var(--accent);">待补充年份</h3>
+                        <p class="text-sm text-gray-600 mb-2"><span class="period-badge">早期活动</span></p>
+                        <p>详细描述待补充...</p>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h3 class="font-bold text-lg mb-2" style="color: var(--accent);">待补充年份</h3>
+                        <p class="text-sm text-gray-600 mb-2"><span class="period-badge">理论著述</span></p>
+                        <p>详细描述待补充...</p>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h3 class="font-bold text-lg mb-2" style="color: var(--accent);">待补充年份</h3>
+                        <p class="text-sm text-gray-600 mb-2"><span class="period-badge">运动参与</span></p>
+                        <p>详细描述待补充...</p>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h3 class="font-bold text-lg mb-2" style="color: var(--accent);">待补充年份</h3>
+                        <p class="text-sm text-gray-600 mb-2"><span class="period-badge">国际交流</span></p>
+                        <p>详细描述待补充...</p>
+                    </div>
+                </div>
+
+                <div class="mt-12 p-6 bg-white border border-gray-200">
+                    <p class="text-sm text-gray-600">📌 提示：完整年谱按时间顺序逐年补充，标注重要历史事件与理论贡献。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 运动参与页（新增） ========== -->
+        <div id="movement" class="page fade-in hidden">
+            <div class="max-w-4xl mx-auto px-4 py-12">
+                <h1 class="section-title mb-8" style="margin-top: 2rem;">运动参与与理论贡献</h1>
+
+                <div class="space-y-8">
+                    <!-- 早期组织工作 -->
+                    <section>
+                        <h2 class="text-lg font-bold mb-4" style="color: var(--accent);">★ 中共党建初期</h2>
+                        <div class="history-card">
+                            <h4>党的组织工作</h4>
+                            <p class="mb-2">吉娃子在中共成立初期参与了党的组织建设工作，包括...</p>
+                            <div>
+                                <span class="period-badge">1921年</span>
+                                <span class="period-badge">中共一大</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 理论探索 -->
+                    <section>
+                        <h2 class="text-lg font-bold mb-4" style="color: var(--accent);">★ 理论著述与思想贡献</h2>
+                        <div class="space-y-3">
+                            <div class="history-card">
+                                <h4>共产主义理论研究</h4>
+                                <p class="mb-2">对马克思主义中国化的理论探索...</p>
+                                <span class="theory-badge">理论著作</span>
+                                <span class="theory-badge">思想贡献</span>
+                            </div>
+                            <div class="history-card">
+                                <h4>社会运动理论</h4>
+                                <p class="mb-2">关于工人运动、农民运动的理论阐述...</p>
+                                <span class="theory-badge">运动理论</span>
+                                <span class="theory-badge">实践指导</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 实际运动 -->
+                    <section>
+                        <h2 class="text-lg font-bold mb-4" style="color: var(--accent);">★ 社会运动参与</h2>
+                        <div class="space-y-3">
+                            <div class="history-card">
+                                <h4>大革命时期</h4>
+                                <p class="mb-2">参与第一次国民革命中的共产党工作...</p>
+                                <span class="activity-badge">大革命</span>
+                                <span class="activity-badge">统一战线</span>
+                            </div>
+                            <div class="history-card">
+                                <h4>土地革命战争</h4>
+                                <p class="mb-2">领导与参与根据地建设和武装斗争...</p>
+                                <span class="activity-badge">武装斗争</span>
+                                <span class="activity-badge">根据地建设</span>
+                            </div>
+                            <div class="history-card">
+                                <h4>抗日战争时期</h4>
+                                <p class="mb-2">在民族矛盾上升为主要矛盾时期的贡献...</p>
+                                <span class="activity-badge">抗日救国</span>
+                                <span class="activity-badge">统一战线</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 国际交流 -->
+                    <section>
+                        <h2 class="text-lg font-bold mb-4" style="color: var(--accent);">★ 国际工人运动联系</h2>
+                        <div class="history-card">
+                            <h4>共产国际关系</h4>
+                            <p class="mb-2">与共产国际的联系、参与国际会议、学习苏联经验等...</p>
+                            <span class="theory-badge">国际交流</span>
+                            <span class="theory-badge">思想借鉴</span>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="mt-12 p-6 bg-white border border-gray-200">
+                    <p class="text-sm text-gray-600">📌 本页详细呈现吉娃子在共产主义运动中的实践活动与理论贡献，涵盖组织工作、思想探索、社会运动等多个维度。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 照片归档页 ========== -->
+        <div id="photos" class="page fade-in hidden">
+            <div class="max-w-6xl mx-auto px-4 py-12">
+                <h1 class="section-title mb-8" style="margin-top: 2rem;">历史照片归档</h1>
+
+                <div class="mb-10">
+                    <h2 class="text-xl font-bold mb-6" style="color: var(--ink);">
+                        <span class="period-badge">早期</span> 思想启蒙与早期活动
+                    </h2>
+                    <div class="image-grid">
+                        <div class="card-hover image-card cursor-pointer" onclick="openImageModal('image1')">
+                            <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 flex items-center justify-center">
+                                <span class="text-gray-500">图片待上传</span>
+                            </div>
+                        </div>
+                        <div class="card-hover image-card cursor-pointer" onclick="openImageModal('image2')">
+                            <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 flex items-center justify-center">
+                                <span class="text-gray-500">图片待上传</span>
+                            </div>
+                        </div>
+                        <div class="card-hover image-card cursor-pointer" onclick="openImageModal('image3')">
+                            <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 flex items-center justify-center">
+                                <span class="text-gray-500">图片待上传</span>
+                            </div>
+                        </div>
+                        <div class="card-hover image-card cursor-pointer" onclick="openImageModal('image4')">
+                            <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 flex items-center justify-center">
+                                <span class="text-gray-500">图片待上传</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-10">
+                    <h2 class="text-xl font-bold mb-6" style="color: var(--ink);">
+                        <span class="period-badge">运动期间</span> 大革命与革命斗争时期
+                    </h2>
+                    <div class="image-grid">
+                        <div class="card-hover image-card cursor-pointer" onclick="openImageModal('image5')">
+                            <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 flex items-center justify-center">
+                                <span class="text-gray-500">图片待上传</span>
+                            </div>
+                        </div>
+                        <div class="card-hover image-card cursor-pointer" onclick="openImageModal('image6')">
+                            <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 flex items-center justify-center">
+                                <span class="text-gray-500">图片待上传</span>
+                            </div>
+                        </div>
+                        <div class="card-hover image-card cursor-pointer" onclick="openImageModal('image7')">
+                            <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 flex items-center justify-center">
+                                <span class="text-gray-500">图片待上传</span>
+                            </div>
+                        </div>
+                        <div class="card-hover image-card cursor-pointer" onclick="openImageModal('image8')">
+                            <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 flex items-center justify-center">
+                                <span class="text-gray-500">图片待上传</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-xl font-bold mb-6" style="color: var(--ink);">
+                        <span class="period-badge">晚年</span> 思想总结与学术活动
+                    </h2>
+                    <div class="image-grid">
+                        <div class="card-hover image-card cursor-pointer" onclick="openImageModal('image9')">
+                            <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 flex items-center justify-center">
+                                <span class="text-gray-500">图片待上传</span>
+                            </div>
+                        </div>
+                        <div class="card-hover image-card cursor-pointer" onclick="openImageModal('image10')">
+                            <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 flex items-center justify-center">
+                                <span class="text-gray-500">图片待上传</span>
+                            </div>
+                        </div>
+                        <div class="card-hover image-card cursor-pointer" onclick="openImageModal('image11')">
+                            <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 flex items-center justify-center">
+                                <span class="text-gray-500">图片待上传</span>
+                            </div>
+                        </div>
+                        <div class="card-hover image-card cursor-pointer" onclick="openImageModal('image12')">
+                            <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 flex items-center justify-center">
+                                <span class="text-gray-500">图片待上传</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图片放大模态框 -->
+        <div id="imageModal" class="modal" onclick="closeImageModal()">
+            <div class="modal-content m-auto" onclick="event.stopPropagation()">
+                <div class="relative bg-white p-6">
+                    <button class="absolute top-4 right-4 text-2xl" onclick="closeImageModal()" style="color: var(--ink);">✕</button>
+                    <img id="modalImage" src="" alt="" class="max-w-full max-h-96 mx-auto">
+                    <div class="mt-4 text-center">
+                        <p class="font-bold">图片标题待补充</p>
+                        <p class="text-sm text-gray-600 mt-2">年份：待补充 | 来源：待补充</p>
+                        <p class="text-sm text-gray-600 mt-2">历史背景与照片描述待补充...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 文献库页 ========== -->
+        <div id="documents" class="page fade-in hidden">
+            <div class="max-w-4xl mx-auto px-4 py-12">
+                <h1 class="section-title mb-8" style="margin-top: 2rem;">文献库</h1>
+
+                <div class="mb-12">
+                    <h2 class="text-xl font-bold mb-6" style="color: var(--ink);">
+                        <span class="period-badge">理论著作</span> 共产主义理论与思想文献
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="card-hover pdf-card p-6 bg-white">
+                            <div class="flex items-start">
+                                <div class="text-3xl mr-4" style="color: var(--accent);">📑</div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold mb-1">理论著作名称待补充.pdf</h3>
+                                    <p class="text-sm text-gray-600 mb-2">年份：待补充 | 来源：待补充</p>
+                                    <div class="mb-2">
+                                        <span class="theory-badge">理论</span>
+                                        <span class="theory-badge">共产主义</span>
+                                    </div>
+                                    <p class="text-sm text-gray-700 mb-3">理论著作内容简介待补充...</p>
+                                    <button class="btn">在线预览</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-hover pdf-card p-6 bg-white">
+                            <div class="flex items-start">
+                                <div class="text-3xl mr-4" style="color: var(--accent);">📑</div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold mb-1">理论著作名称待补充.pdf</h3>
+                                    <p class="text-sm text-gray-600 mb-2">年份：待补充 | 来源：待补充</p>
+                                    <div class="mb-2">
+                                        <span class="theory-badge">理论</span>
+                                        <span class="theory-badge">社会运动</span>
+                                    </div>
+                                    <p class="text-sm text-gray-700 mb-3">理论著作内容简介待补充...</p>
+                                    <button class="btn">在线预览</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-12">
+                    <h2 class="text-xl font-bold mb-6" style="color: var(--ink);">
+                        <span class="period-badge">运动资料</span> 社会运动与组织档案
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="card-hover pdf-card p-6 bg-white">
+                            <div class="flex items-start">
+                                <div class="text-3xl mr-4" style="color: var(--accent);">📑</div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold mb-1">运动档案名称待补充.pdf</h3>
+                                    <p class="text-sm text-gray-600 mb-2">年份：待补充 | 收藏单位：待补充</p>
+                                    <div class="mb-2">
+                                        <span class="activity-badge">运动记录</span>
+                                        <span class="activity-badge">组织档案</span>
+                                    </div>
+                                    <p class="text-sm text-gray-700 mb-3">档案资料内容简介待补充...</p>
+                                    <button class="btn">在线预览</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-hover pdf-card p-6 bg-white">
+                            <div class="flex items-start">
+                                <div class="text-3xl mr-4" style="color: var(--accent);">📑</div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold mb-1">会议记录名称待补充.pdf</h3>
+                                    <p class="text-sm text-gray-600 mb-2">年份：待补充 | 来源：待补充</p>
+                                    <div class="mb-2">
+                                        <span class="activity-badge">会议记录</span>
+                                        <span class="activity-badge">党的历史</span>
+                                    </div>
+                                    <p class="text-sm text-gray-700 mb-3">会议记录内容简介待补充...</p>
+                                    <button class="btn">在线预览</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-xl font-bold mb-6" style="color: var(--ink);">
+                        <span class="period-badge">手稿</span> 信函与个人手稿
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="card-hover pdf-card p-6 bg-white">
+                            <div class="flex items-start">
+                                <div class="text-3xl mr-4" style="color: var(--accent);">✍️</div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold mb-1">手稿/信函名称待补充.pdf</h3>
+                                    <p class="text-sm text-gray-600 mb-2">年份：待补充 | 收藏机构：待补充</p>
+                                    <div class="mb-2">
+                                        <span class="theory-badge">手稿</span>
+                                        <span class="theory-badge">个人文献</span>
+                                    </div>
+                                    <p class="text-sm text-gray-700 mb-3">手稿内容与历史价值待补充...</p>
+                                    <button class="btn">在线预览</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 书籍整理页 ========== -->
+        <div id="books" class="page fade-in hidden">
+            <div class="max-w-4xl mx-auto px-4 py-12">
+                <h1 class="section-title mb-8" style="margin-top: 2rem;">书籍整理</h1>
+
+                <div class="mb-12">
+                    <h2 class="text-xl font-bold mb-6" style="color: var(--ink);">
+                        📖 <span class="accent-red">人物著作</span>
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="card-hover book-card">
+                            <div class="book-cover"></div>
+                            <div class="flex-1">
+                                <h3 class="font-bold mb-1">著作名称待补充</h3>
+                                <p class="text-sm text-gray-600 mb-2">年份：待补充</p>
+                                <div class="mb-2">
+                                    <span class="theory-badge">理论</span>
+                                    <span class="theory-badge">共产主义</span>
+                                </div>
+                                <p class="text-sm text-gray-700">著作主要内容与理论意义待补充...</p>
+                            </div>
+                        </div>
+
+                        <div class="card-hover book-card">
+                            <div class="book-cover"></div>
+                            <div class="flex-1">
+                                <h3 class="font-bold mb-1">著作名称待补充</h3>
+                                <p class="text-sm text-gray-600 mb-2">年份：待补充</p>
+                                <div class="mb-2">
+                                    <span class="theory-badge">理论</span>
+                                    <span class="theory-badge">运动实践</span>
+                                </div>
+                                <p class="text-sm text-gray-700">著作主要内容与理论意义待补充...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-12">
+                    <h2 class="text-xl font-bold mb-6" style="color: var(--ink);">
+                        📚 <span class="accent-red">学术研究</span>
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="card-hover book-card">
+                            <div class="book-cover"></div>
+                            <div class="flex-1">
+                                <h3 class="font-bold mb-1">研究著作名称待补充</h3>
+                                <p class="text-sm text-gray-600 mb-2">作者：待补充 | 年份：待补充</p>
+                                <div class="mb-2">
+                                    <span class="theory-badge">研究</span>
+                                    <span class="theory-badge">思想评价</span>
+                                </div>
+                                <p class="text-sm text-gray-700">研究内容与学术意义待补充...</p>
+                            </div>
+                        </div>
+
+                        <div class="card-hover book-card">
+                            <div class="book-cover"></div>
+                            <div class="flex-1">
+                                <h3 class="font-bold mb-1">传记/研究著作待补充</h3>
+                                <p class="text-sm text-gray-600 mb-2">作者：待补充 | 年份：待补充</p>
+                                <div class="mb-2">
+                                    <span class="theory-badge">传记</span>
+                                    <span class="theory-badge">历史评价</span>
+                                </div>
+                                <p class="text-sm text-gray-700">著作主要内容与价值待补充...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-xl font-bold mb-6" style="color: var(--ink);">
+                        📕 <span class="accent-red">相关史料</span>
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="card-hover book-card">
+                            <div class="book-cover"></div>
+                            <div class="flex-1">
+                                <h3 class="font-bold mb-1">运动史料书籍待补充</h3>
+                                <p class="text-sm text-gray-600 mb-2">编著：待补充 | 年份：待补充</p>
+                                <div class="mb-2">
+                                    <span class="activity-badge">运动历史</span>
+                                    <span class="activity-badge">时代背景</span>
+                                </div>
+                                <p class="text-sm text-gray-700">书籍涉及内容与相关性说明待补充...</p>
+                            </div>
+                        </div>
+
+                        <div class="card-hover book-card">
+                            <div class="book-cover"></div>
+                            <div class="flex-1">
+                                <h3 class="font-bold mb-1">共产主义理论书籍待补充</h3>
+                                <p class="text-sm text-gray-600 mb-2">编著：待补充 | 年份：待补充</p>
+                                <div class="mb-2">
+                                    <span class="theory-badge">理论书籍</span>
+                                    <span class="theory-badge">思想史料</span>
+                                </div>
+                                <p class="text-sm text-gray-700">书籍涉及内容与相关性说明待补充...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 史实趣事页 ========== -->
+        <div id="anecdotes" class="page fade-in hidden">
+            <div class="max-w-4xl mx-auto px-4 py-12">
+                <h1 class="section-title mb-8" style="margin-top: 2rem;">史实趣事</h1>
+
+                <div class="space-y-8">
+                    <div class="history-card">
+                        <h4>★ 运动中的关键时刻</h4>
+                        <p class="mb-2">事迹描述待补充...</p>
+                        <p class="text-sm text-gray-600">📌 史料来源：待补充</p>
+                    </div>
+
+                    <div class="history-card">
+                        <h4>★ 理论探索的故事</h4>
+                        <p class="mb-2">事迹描述待补充...</p>
+                        <p class="text-sm text-gray-600">📌 出处：待补充</p>
+                    </div>
+
+                    <div class="p-6 bg-white border-l-4 border-gray-400">
+                        <div class="flex items-center mb-3">
+                            <span style="background-color: #999; color: white; padding: 0.25rem 0.75rem; border-radius: 2px; font-size: 0.8rem; font-weight: bold;">趣事</span>
+                            <h3 class="font-bold ml-3">生活细节待补充</h3>
+                        </div>
+                        <p class="text-gray-700 mb-2">生活场景与个人特色待补充...</p>
+                        <p class="text-sm text-gray-600">📌 出处：待补充</p>
+                    </div>
+
+                    <div class="p-6 bg-white border-l-4 border-gray-400">
+                        <div class="flex items-center mb-3">
+                            <span style="background-color: #999; color: white; padding: 0.25rem 0.75rem; border-radius: 2px; font-size: 0.8rem; font-weight: bold;">趣事</span>
+                            <h3 class="font-bold ml-3">国际交往细节待补充</h3>
+                        </div>
+                        <p class="text-gray-700 mb-2">国际活动与跨文化交流的故事...</p>
+                        <p class="text-sm text-gray-600">📌 出处：待补充</p>
+                    </div>
+                </div>
+
+                <div class="mt-12 p-6 bg-white border border-gray-200">
+                    <p class="text-sm text-gray-600">⚠️ 严格说明：本页面仅收录有明确史料记载与学术认可的事迹，严格杜绝野史谣言与民间传说。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 关于本站页 ========== -->
+        <div id="about" class="page fade-in hidden">
+            <div class="max-w-4xl mx-auto px-4 py-12">
+                <h1 class="section-title mb-8" style="margin-top: 2rem;">关于本站</h1>
+
+                <div class="space-y-8">
+                    <section>
+                        <h2 class="text-xl font-bold mb-4" style="color: var(--ink);">📌 建站说明</h2>
+                        <div class="p-6 bg-white border border-gray-200">
+                            <p class="mb-3">《<span class="accent-red">吉娃子人物史料资料库</span>》是一个纯学术性的人物历史资料整理平台，致力于系统地收集、整理和展示吉娃子相关的历史文献、照片、著作及学术研究成果。</p>
+                            <p class="mb-3">吉娃子是共产主义运动的先驱与理论家，其思想贡献与实践活动在中共党史和共产主义运动中占有重要地位。本站通过集中呈现其相关资料，为学术研究与历史认知提供系统的参考资源。</p>
+                            <p class="mb-3"><strong>本站建立的目的：</strong></p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                <li>为学术研究者提供便捷的资料查阅途径</li>
+                                <li>系统梳理共产主义运动中的思想贡献与实践</li>
+                                <li>推动共产党史与理论研究的深入发展</li>
+                                <li>弘扬革命文化与学术精神</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2 class="text-xl font-bold mb-4" style="color: var(--ink);">📚 史料溯源规则</h2>
+                        <div class="p-6 bg-white border border-gray-200">
+                            <p class="mb-3 font-bold">本站遵循以下严格的学术规范：</p>
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="font-bold text-sm mb-1" style="color: var(--accent);">✓ 来源真实性</p>
+                                    <p class="text-sm text-gray-700">所有资料均必须来自明确的、可核实的历史来源，包括档案馆、图书馆、学术机构、党的历史研究部门等。</p>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-sm mb-1" style="color: var(--accent);">✓ 学术认可</p>
+                                    <p class="text-sm text-gray-700">优先收录经过学术界认可和引用的文献资料，确保学术价值与理论意义。</p>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-sm mb-1" style="color: var(--accent);">✓ 明确标注</p>
+                                    <p class="text-sm text-gray-700">每份资料都清晰标注来源、年份、收藏机构、历史背景等必要信息。</p>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-sm mb-1" style="color: var(--accent);">✓ 野史杜绝</p>
+                                    <p class="text-sm text-gray-700">严格排除野史谣言、民间传说等缺乏可信来源的内容，确保学术严谨性。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2 class="text-xl font-bold mb-4" style="color: var(--ink);">📢 更新声明</h2>
+                        <div class="p-6 bg-white border border-gray-200">
+                            <p class="mb-3">本站资料库正在建设中，持续更新。</p>
+                            <p class="mb-3"><strong>更新计划：</strong></p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                <li>定期补充新发现的运动文献与理论著作</li>
+                                <li>扩充照片、手稿、档案等各类史料资源</li>
+                                <li>完善年谱、运动参与等基础信息</li>
+                                <li>与学术机构、档案部门合作，获取更多一手资料</li>
+                                <li>持续更新学术研究成果与评论文献</li>
+                            </ul>
+                            <p class="mt-4 text-sm text-gray-600">最后更新：2024年5月</p>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2 class="text-xl font-bold mb-4" style="color: var(--ink);">⚖️ 免责声明</h2>
+                        <div class="p-6 bg-white border border-gray-200">
+                            <p class="text-sm text-gray-700">本站所有内容仅供学术研究与教育用途，不构成任何商业目的。网站管理者已尽最大努力确保所有资料的准确性与真实性，但不对使用者因使用本站信息而产生的任何后果承担责任。本站欢迎学术批评与建议。</p>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2 class="text-xl font-bold mb-4" style="color: var(--ink);">📧 联系我们</h2>
+                        <div class="p-6 bg-white border border-gray-200">
+                            <p class="mb-3">如您有以下需求，欢迎与我们联系：</p>
+                            <ul class="list-disc list-inside space-y-1 text-gray-700 mb-4">
+                                <li>提供新的运动资料或档案线索</li>
+                                <li>指正资料中的学术错误</li>
+                                <li>建议改进网站功能与内容组织</li>
+                                <li>党史研究与学术合作交流</li>
+                            </ul>
+                            <p class="text-sm text-gray-600">📧 联系邮箱：待补充</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <footer style="background-color: var(--ink); color: var(--cream); text-align: center; padding: 2rem; margin-top: 4rem; border-top: 2px solid var(--accent);">
+        <p class="mb-2">© 2024 吉娃子人物史料资料库</p>
+        <p class="text-sm">★ 纯学术研究用途 | 严禁商业使用</p>
+    </footer>
+
+    <script>
+        // 页面切换函数
+        function switchPage(pageName) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.add('hidden');
+            });
+
+            const page = document.getElementById(pageName);
+            if (page) {
+                page.classList.remove('hidden');
+                page.classList.add('fade-in');
+            }
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            window.scrollTo(0, 0);
+        }
+
+        // 移动端菜单切换
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // 图片放大预览
+        function openImageModal(imageId) {
+            const modal = document.getElementById('imageModal');
+            modal.classList.add('active');
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+        }
+
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('imageModal');
+            if (event.target === modal) {
+                closeImageModal();
+            }
+        });
+
+        window.addEventListener('load', function() {
+            document.querySelector('.page').classList.add('fade-in');
+        });
+    </script>
+</body>
+</html>
